@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Find My Seat in Wedding</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <!-- <link rel="stylesheet" href="css/styles.css" /> -->
+    </head>
+    <body>
+        <p>Page content here</p>
+        <div class="container">
+            <div id="weddingInfo" class="alert alert-danger" role="alert" style="margin: 0 auto;" >
+                <h4 class="alert-heading">黃X吳府喜宴</h4>
+                <p>台東喜來登桂田酒店B1樓</p>
+                <p>台東市正氣路316號</p>
+                <p>中午十二時</p>
+                <p>民國一o八年七月二十八日（日）</p>
+                <hr>
+                <p class="mb-0">恭請闔第光臨！</p>
+            </div>
+            <div id="searchWrapper" style="margin: 0 auto;">
+                我的位置在哪兒
+                <input id="guestNameSearch" class="form-control form-control-lg" type="text" placeholder="請輸入賓客姓名" >
+                <div id="result"></div>
+            </div>
+            <div id="deskWrapper" style="margin: 20px auto;">
+                <img id="deskArea" src="/area.jpg" />
+                <div id="deskMask">
+                    <div id="seat5" class="seat"></div>
+                </div>
+            </div>
+        </div>
+        <!-- include jQuery via CDN -->
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <!-- your own file in your project folder -->
+        <script src="wedding_desk.json"></script>
+        <style>
+            #deskWrapper {
+                position:relative;
+                width: 641px;
+                height: 803px;
+            }
+            #deskArea {
+                width: 100%;
+            }
+            #deskMask {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,.1)
+            }
+            #seat5 {
+                position: absolute;
+                top: 94px;
+                right: 212px;
+                background: yellow;
+                width: 80px;
+                height: 80px;
+                border-radius: 100%;
+                opacity: 0;
+            }
+            .seat-normal {
+                position: absolute;
+                width: 40px;
+                height: 40px;
+                border-radius: 100%;
+                opacity: 0;
+            }
+            #seat1 {
+                top: 106px;
+                right: 501px;
+            }
+            #seat2 {
+                top: 110px;
+                right: 435px;
+            }
+            #seat3 {
+                top: 110px;
+                right: 379px;
+            }
+            #seat4 {
+                top: 114px;
+                right: 321px;
+            }
+            #seat6 {
+                top: 93px;
+                right: 153px;
+            }
+            #seat7 {
+                top: 93px;
+                right: 95px; 
+            }
+            #seat8 {
+                top: 93px;
+                right: 39px; 
+            }
+            #seat9 {
+                top: 159px;
+                right: 37px;
+            }
+            #seat10 {
+                top: 159px;
+                right: 92px; 
+            }
+            #seat11 { 
+                top: 160px;
+                right: 146px;
+
+            }
+            #seat12 { 
+                top: 180px;
+                right: 201px;
+
+            }
+            #seat13 { 
+                top: 180px;
+                right: 267px;
+
+            }
+            #seat14 { 
+                top: 163px;
+                right: 349px;
+            }
+            #seat15 { 
+                top: 163px;
+                right: 406px;
+            }
+            #seat16 { 
+               top: 163px;
+                right: 464px; 
+            }
+            #seat17 { 
+                top: 163px;
+                right: 532px;
+            }
+            #seat18 { 
+                top: 224px;
+                right: 542px;
+            }
+            #seat19 { 
+                top: 269px;
+                right: 510px;
+            }
+            #seat20 { 
+                top: 262px;
+                right: 452px;
+            }
+            #seat21 { 
+                top: 233px;
+                right: 404px;
+            }
+            #seat22 { 
+                top: 233px;
+                right: 350px;
+
+            }
+            #seat23 { 
+                top: 250px;
+                right: 267px;
+
+            }
+            #seat24 { 
+                top: 243px;
+                right: 205px;
+            }
+            #seat25 { 
+                top: 265px;
+                right: 149px;
+            }
+            #seat26 { 
+                top: 265px;
+                right: 88px;
+            }
+            #seat27 { 
+                top: 232px;
+                right: 38px;
+            }
+            #seat28 { 
+                top: 306px;
+                right: 38px;
+            }
+            #seat29 { 
+                top: 301px;
+                right: 205px;
+            }
+            #seat30 { 
+                top: 318px;
+                right: 267px;
+            }
+            #seat31 { 
+                top: 292px;
+                right: 346px;
+            }
+            #seat32 { 
+                top: 292px;
+                right: 402px; 
+            }
+            #seat33 { 
+                top: 335px;
+                right: 542px;
+
+            }
+            #seat34 { 
+                top: 375px;
+                right: 504px;
+            }
+            #seat35 { 
+                top: 357px;
+                right: 454px;
+            }
+            #seat36 { 
+                top: 355px;
+                right: 402px;
+            }
+            #seat37 { 
+                top: 357px;
+                right: 351px;
+            }
+            #seat38 { 
+                top: 369px;
+                right: 267px;
+            }
+            #seat39 { 
+                top: 354px;
+                right: 205px;
+            }
+            #seat40 { 
+                top: 370px;
+                right: 146px;
+            }
+            #seat41 { 
+                top: 370px;
+                right: 87px;
+            }
+            #seat42 { 
+                top: 392px;
+                right: 38px;
+            }
+            #seat43 { 
+                top: 410px;
+                right: 205px;
+            }
+            #seat44 { 
+                top: 423px;
+                right: 267px;
+            }
+            #seat45 { 
+                top: 413px;
+                right: 351px;
+            }
+            #seat46 { 
+                top: 411px;
+                right: 402px;
+            }
+            #seat47 { 
+                top: 419px;
+                right: 542px;
+            }
+            #seat48 { 
+                top: 461px;
+                right: 506px;
+            }
+            #seat49 { 
+                top: 461px;
+                right: 456px;
+            }
+            #seat50 { 
+                top: 468px;
+                right: 402px;
+            }
+            #seat51 {
+                top: 474px;
+                right: 351px;
+            }
+            #seat52 {
+                top: 478px;
+                right: 267px;
+
+            }
+            #seat53 {
+                top: 466px;
+                right: 205px;
+            }
+            #seat54 { 
+                top: 461px;
+                right: 156px;  
+            }
+            #seat55 {
+                top: 461px;
+                right: 98px;
+            }
+            #seat56 {
+                top: 461px;
+                right: 40px;
+            }
+            #seat57 { 
+                top: 547px;
+                right: 99px;
+
+            }
+            #seat58 {
+                top: 586px;
+                right: 135px;
+            }
+            #seat59 {
+                top: 542px;
+                right: 160px;
+            }
+            #seat60 {
+                top: 522px;
+                right: 205px;
+            }
+            #seat61 {
+                top: 531px;
+                right: 267px;
+            }
+            #seat62 { 
+                top: 570px;
+                right: 310px;
+
+            }
+            #seat63 {
+                top: 531px;
+                right: 351px;
+            }
+            #seat64 {
+                top: 531px;
+                right: 402px;
+            }
+            #seat65 {
+                top: 540px;
+                right: 473px;
+            }
+
+            
+        </style>
+        <script type="text/javascript">
+        const data = [
+            {
+                desk_num: 1,
+                desk_title: "親家桌",
+                guests: ["女方親戚 / 4 /", "游旻軒 / 1.2 /", "伴娘-鈞鈞 1", "伴娘-佳音 1", "程秋華 1"]
+            },
+            {
+                desk_num: 2,
+                desk_title: "親家桌",
+                guests: ["女方親戚 / 10 /"]
+            },
+            {
+                desk_num: 3,
+                desk_title: "親家桌",
+                guests: ["女方親戚 / 10 /"]
+            },
+            {
+                desk_num: 3,
+                desk_title: "親家桌",
+                guests: ["女方親戚 / 10 /"]
+            },
+            {
+                desk_num: 4,
+                desk_title: "男方親友",
+                guests: ["黃長生 / 2 /", "黃宗仁 / 3 /","黃麗英 / 2 /", "黃每 / 2 /", "高炳松 / 1 /"]
+            },
+            {
+                desk_num: 5,
+                desk_title: "主桌",
+                guests: ["黃建彰","吳麗敏","黃錦地","張玉惠","吳宗益","許素珠","游世欽","黃宗仁","黃宜盛","劉立委","麗敏阿公","麗敏姑姑"]
+            },
+            {
+                desk_num: 6,
+                desk_title: "青年菁英",
+                guests: ["姜立偉 1","黃憲載 1","徐豫鹿 1","蕭道田 1","董又瑋 2","呂源明 2.2","董又銘 2"]
+            },
+            {
+                desk_num: 7,
+                desk_title: "銷售菁英",
+                guests: ["鄭敬達 2","伍宛琳 1","陳美惠 1","陳季宏 1","蔡坤樹 1","陳弘杰 2","黃柏菁 2"]
+            },
+            {
+                desk_num: 8,
+                desk_title: "新郎好友",
+                guests: ["孟郁涵 1","陳怡礽 1","劉育承 1","胡世豐 2","黃源智 2","黃俊浩 2"]
+            },
+            {
+                desk_num: 9,
+                desk_title: "梁海集團",
+                guests: ["陳冠廷 2.1","劉浩威 2","葛致中 2","沈建志 2.1","何信興 1"]
+            },
+            {
+                desk_num: 10,
+                desk_title: "梁海集團",
+                guests: ["陳韋均 1","林奇謀 1","陳嘉豪 2","唐偉翔 2.2","賴建維 1","陳偉哲 1","李怡慎 1"]
+            },
+            {
+                desk_num: 11,
+                desk_title: "素食席",
+                guests: ["李茂生 / 1 /","林渝鳳 / 2 /","李啟北  / 1 /","吳芳蘭 / 1 /","黃炳欽 / 2 /","鄭碧燕 / 1 /","倪永和 / 2 /","陳式鴻 / 1 /","施和美 / 1 /"]
+            },
+            {
+                desk_num: 12,
+                desk_title: "不動產開發公會",
+                guests: ["吳燦坤 / 2 /","吳水富 / 1 /","王復鎗 / 1 /","李謀定 / 2 /","張登陸 / 2 /","劉文城 / 2 /","吳玉山 / 2 /"]
+            },
+            {
+                desk_num: 13,
+                desk_title: "不動產開發公會",
+                guests: ["黃啟倫 / 2 /","呂冠衡 / 1 /","沈林傑 / 1 /","夏貴勇 / 1 /","王世賢 / 1 /","洪平森 / 2 /","楊玉全 / 2 /","林詠盛 / 2 /"]
+            },
+            {
+                desk_num: 14,
+                desk_title: "男方親友",
+                guests: ["陳素蓮 / 2 /","黃信揚 / 2 /","阿嬤 / 2 /","劉芸榛 / 3 /","張富君 / 2 /"]
+            },
+            {
+                desk_num: 15,
+                desk_title: "男方親友",
+                guests: ["張淳絮 / 4 /","許雪梅 / 2 /","黃紳偉 / 1 /","張富雄 / 2 /","張金玉 / 1 /"]
+            },
+            {
+                desk_num: 16,
+                desk_title: "來賓席",
+                guests: ["戴聰和(女兒) / 2 /","盧麗雪 / 1 /","孫月秀 / 2 /","張文娟 / 1 /","林秀貞 / 2 /","林鈺光 / 2 /"]
+            },
+            {
+                desk_num: 17,
+                desk_title: "來賓席",
+                guests: ["任萬忠 / 1 /","陳大易 / 1 /","白添家 / 2 /","古釘珍 / 1 /","洪俊生 / 2 /","易淑娟 / 2 /", "彭泰詳"]
+            },
+            {
+                desk_num: 18,
+                desk_title: "來賓席",
+                guests: ["王明峰 / 2 /","郭重懋 / 1 /","賴煥辰 / 1 /","陳承基 / 2 /","鄭志通 / 1 /","李尉薇 / 2 /","甘淑慧 / 1 /"]
+            },
+            {
+                desk_num: 19,
+                desk_title: "來賓席",
+                guests: ["傳穎偉 / 2 /","戴一貫 / 2 /","陳仁東 / 1 /","賈孝遠 / 2 /","陳明寬 / 1 /","陳錦慧 黃榮昌 / 2 /"]
+            },
+            {
+                desk_num: 20,
+                desk_title: "來賓席",
+                guests: ["羅銀鳳 / 1 /","吳井槐 / 1 /","林威志 / 1 /","莊世揚 / 1 /","劉建忠 / 2 /","客家麵店 / 1 /"]
+            },
+            {
+                desk_num: 21,
+                desk_title: "來賓席",
+                guests: ["徐世明  / 1 /","劉奕堡 / 2 /","張順龍 / 2 /","林進發 / 1 /","林永山 / 2 /","黃盈輔 / 1 /","林照國 / 2 /"]
+            },
+            {
+                desk_num: 22,
+                desk_title: "來賓席",
+                guests: ["李數托 / 1 /","李茂生 / 1 /","鍾昇遠 / 3 /","林淦淵 / 1 /","丁美雲 / 2 /","張順一 / 2 /"]
+            },
+            {
+                desk_num: 23,
+                desk_title: "不動產開發公會",
+                guests: ["鄭忠明 / 2 /","戴聰和 / 2 /","洪德勝 / 2 /","何福壽 / 2 /","卓永富 / 2 /","張永義 / 2 /"]
+            },
+            {
+                desk_num: 24,
+                desk_title: "不動產開發公會",
+                guests: ["林裕盛 / 2 /","洪光佐 / 2 /","章政城 / 2  /","黃文弘 / 2 /","吳斐琳 / 2 /"]
+            },
+            {
+                desk_num: 25,
+                desk_title: "梁海集團",
+                guests: ["張品澤 1","陳鍵靚 2","李信璋 1","陳旻佑 2.1","林文淵 1","金威志 1","黃致豪 1","李政欣 1"]
+            },
+            {
+                desk_num: 26,
+                desk_title: "青年菁英",
+                guests: ["黃俊傑 2.1","洪伯村 2.2","吳維埻 2.3","盧博雅 2","許欽傑 1"]
+            },
+            {
+                desk_num: 27,
+                desk_title: "梁海集團",
+                guests: ["張育誠 2","劉錦奮 2.1","林煒登 2.2","李致遠 2.1"]
+            },
+            {
+                desk_num: 28,
+                desk_title: "梁海集團",
+                guests: ["陳港 3","葉訓榮 2.1","吳其遠 2.2","王穎漢 2"]
+            },
+            {
+                desk_num: 29,
+                desk_title: "青商菁英",
+                guests: ["吳鎮宇 3","陳致延 1","施志聰 2","蔡佩峰 2.1","黃治維 1","彭群皓 1"]
+            },
+            {
+                desk_num: 30,
+                desk_title: "不動產開發公會",
+                guests: ["黃正賢 / 2 /","余基明 / 2 /","蔡德昌 / 2 /","鄭福成 / 2 /","張明人 / 2 /","陳茂盛 / 1 /"]
+            },
+            {
+                desk_num: 31,
+                desk_title: "來賓席",
+                guests: ["周拓良 / 1 /","徐儷玲 / 1 /","劉春鳳 / 2 /","邱紹群 / 1 /","林如豐 / 1 /","陳建源 / 1 /","傅文鵬 / 1 /","吳博文 / 1 /","劉清郎 / 1 /"]
+            },
+            {
+                desk_num: 32,
+                desk_title: "來賓席",
+                guests: ["胡邱樑 / 1 /","施欽元 / 2 /","林忠山 / 2 /","劉萬貴 / 2 /","謝政益 / 1 /","劉清三 / 2 /"]
+            },
+            {
+                desk_num: 33,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 34,
+                desk_title: "松柏會",
+                guests: []
+            },
+            {
+                desk_num: 35,
+                desk_title: "松柏會",
+                guests: []
+            },
+            {
+                desk_num: 36,
+                desk_title: "來賓席",
+                guests: ["潘宏益 / 2 /","楊明勳 / 2 /","李明聰 / 2 /","謝黃極 / 2 /","何振銘 / 2 /"]
+            },
+            {
+                desk_num: 37,
+                desk_title: "來賓席",
+                guests: ["吳明昌 / 2 /","陳國政 / 2 /","黃志銘 / 2 /","林沛融 / 2 /","丁鵬超 / 2 /"]
+            },
+            {
+                desk_num: 38,
+                desk_title: "來賓席",
+                guests: ["林益生(1外勞) / 2 /","林直正 / 1 /","許良助 / 1 /","洪正峯 / 2 /","梁維斗 / 1 /","陳能章 / 2 /","吳麗真 / 1 /"]
+
+            },
+            {
+                desk_num: 39,
+                desk_title: "青商菁英",
+                guests: ["陳柏軒 2","施文祥 2","邱品學 1","賴閎澍 2.2","邱涵 2","廖家寬 1"]
+            },
+            {
+                desk_num: 40,
+                desk_title: "青聯菁英",
+                guests: ["侯富元 2","葉育東 2","方顯松 1","楊秉閎 1","羅順仁 2","江至庭 2"]
+            },
+            {
+                desk_num: 41,
+                desk_title: "梁海集團",
+                guests: ["王泰捷 1","游奕承 2","柯宏瑜 2","陳世豪 2","楊明錦 2.1","顏子馮 1"]
+            },
+            {
+                desk_num: 42,
+                desk_title: "新郎球友",
+                guests: ["江信賢 1","王政國 2","張勝堯 2","陳弘儒 1","余承宗 2","吳偉倫 2"]
+            },
+            {
+                desk_num: 43,
+                desk_title: "新郎好友",
+                guests: ["威廉 1","朱宥潤 2.1","陳昱豪 1","蔡文健 1","邵子麟 1","謝昊銓 2","陳震憲 2"]
+            },
+            {
+                desk_num: 44,
+                desk_title: "來賓席",
+                guests: ["江志坤 / 1 /","馬慶安 / 1 /","施忠富 / 1 /","王偉明 / 1 /","吳慶榮 / 2 /","蔡勝雄 / 2 /","連龍財 / 2 /"]
+            },
+            {
+                desk_num: 45,
+                desk_title: "來賓席",
+                guests: ["賴秋銘 / 2 /","林朝欽 / 2 /","柯義賢 / 2 /","蕭富仁 / 2 /","胡炯權 / 1 /","施順雄 / 1 /"]
+            },
+            {
+                desk_num: 46,
+                desk_title: "來賓席",
+                guests: ["陳盛忠 / 2 /","張登永 / 2 /","林明賢 / 2 /","沈文財 / 2 /","昕威鋼鐵 / 2 /"]
+            },
+            {
+                desk_num: 47,
+                desk_title: "松柏會",
+                guests: []
+            },
+            {
+                desk_num: 48,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 49,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 50,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 51,
+                desk_title: "來賓席",
+                guests: ["莊運財 黑馬 / 1 /","林郁芬 楊佩佩 / 2 /","沈志誠 / 2 /","吳仁智 / 1 /","黃國書  / 2 /","盧建旭 / 2 /"]
+            },
+            {
+                desk_num: 52,
+                desk_title: "來賓席",
+                guests: ["鄭進嘉 / 2 /","陳正能 / 1 /","林文雄 / 2 /","廖大全 / 2 /","郭成興 / 1 /","廖朝平 / 2 /"]
+            },
+            {
+                desk_num: 53,
+                desk_title: "馬不老重機",
+                guests: ["何宗穎 1","張弼翔 2","蘇珏宇 2","李文義 2","林紹華 2","呂家華 1"]
+            },
+            {
+                desk_num: 54,
+                desk_title: "青聯菁英",
+                guests: ["鄭龍澤 2","范遠嘉 2","邱煥文 1","許鎧麟 2","張誌中 1","廖偉群 2"]
+            },
+            {
+                desk_num: 55,
+                desk_title: "新郎球友",
+                guests: ["鄭右煜 2","鄭淵鍵 2.1","謝東曄 2","蘇詠霖 1","黃建瑋 2"]
+            },
+            {
+                desk_num: 56,
+                desk_title: "預備席",
+                guests: []
+            },
+            {
+                desk_num: 57,
+                desk_title: "預備席",
+                guests: []
+            },
+            {
+                desk_num: 58,
+                desk_title: "新郎好友",
+                guests: ["鄭逸羣 2.1","陳鎮 2","陳正修 2.1","陳仕諭 1","蔡福源 1","羅智豪 2"]
+            },
+            {
+                desk_num: 59,
+                desk_title: "高中",
+                guests: ["翁光輝 1","武峻 1","邱韋翔 1","陳致宏 2","廖啟瑞 1","黃歆雅 1","黃歆淳 1","吳有三 2"]
+            },
+            {
+                desk_num: 60,
+                desk_title: "國中",
+                guests: ["王逢蘭 1","江錦璁 1","黃冠倫 2","高晨祐 2","陳宗隆 1","許祥瑞 2","廖偉豪 1"]
+            },
+            {
+                desk_num: 61,
+                desk_title: "大學",
+                guests: ["牛竣平 1","葉威廷 2.2","張紀翔 1","劉文峰 1","賴詠欣 2","陳泊瑄 2","張金源 1"]
+            },
+            {
+                desk_num: 62,
+                desk_title: "大學&733",
+                guests: ["李正鵬 2","戴暘翃 1","林承亞 1","李維楷 2","劉智偉 1","蔡秉峰 2","林辰翰 1"]
+            },
+            {
+                desk_num: 63,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 64,
+                desk_title: "商業會",
+                guests: []
+            },
+            {
+                desk_num: 65,
+                desk_title: "預備席2",
+                guests: []
+            }
+        ]
+        jQuery(document).ready(function(){ 
+            // var data = []
+            // $.getJSON("wedding_desk.json", function( data ) {
+            //     data = data
+            // });
+            function searchByName (e) {
+                console.log('ddsd', e.target.value)
+                var ht = ''
+                var result = []
+                var target = e.target.value
+                if (target === '') {
+                    return
+                }
+                console.log(data)
+                for(var k=0; k< data.length; k++) {
+                    var guests = data[k].guests
+                    for( var i=0; i<guests.length; i++ ) {
+                        // console.log(target, guests[i])
+                        if (guests[i].indexOf(target) >= 0) {
+                            result.push({
+                                name: guests[i],
+                                seat: data[k].desk_title,
+                                seatnum: data[k].desk_num
+                            })
+                        }
+                    }
+                }
+                console.log(result)
+                if (result.length > 1) {
+                    console.log(result)
+
+                    ht += '<ul class="list-group">';
+                    for(r=0;r<result.length; r++) {
+                        ht += '<li class="name-trigger list-group-item d-flex justify-content-between align-items-center" data-name="' + result[r].name + '" data-seat="' + result[r].seat + '" data-seatnum="' + result[r].seatnum + '" >' + result[r].name + '<span class="badge badge-primary badge-pill">'+ result[r].seat +'</span>' + '</li>'
+                    }
+                    ht += '</ul>';
+                    $('#result').html(ht)
+                } else if (result.length === 1){
+                    // ht += '<div class="card text-white bg-info mb-3" style="max-width: 18rem;">'+
+                    // '<div class="card-header"> '+ result[0].seat +'貴賓資訊</div>'+
+                    // '<div class="card-body">'+
+                    //     '<h5 class="card-title">貴賓大名：' + result[0].name +'</h5>'+
+                    //     '<p class="card-text">貴賓桌位號：' + result[0].seatnum + ' ' + result[0].seat +'</p>'+
+                    // '</div>'+
+                    // '</div>';
+                    lightDesk(result[0])
+                } else {
+                    $('#result').html('')
+                }
+                
+            }
+            function lightDesk (result) {
+                var ht = ''
+                console.log(result)
+                ht += '<div class="card text-white bg-info mb-3" style="max-width: 18rem;margin: 10px auto;">'+
+                    '<div class="card-header"> '+ result.seat +' x 貴賓資訊</div>'+
+                    '<div class="card-body">'+
+                        '<h5 class="card-title">貴賓大名：' + result.name +'</h5>'+
+                        '<p class="card-text">貴賓桌位號：' + result.seatnum + ' ' + result.seat +'</p>'+
+                    '</div>'+
+                    '</div>';
+                $('#result').html(ht)
+                $('#deskWrapper .seat').css('background', 'transparent').css('opacity', 0)
+                $('#deskWrapper #seat' + result.seatnum).css('background', 'yellow').css('opacity', .7)
+            }
+            $("#guestNameSearch").on("change", searchByName);
+            $('#searchWrapper').on("click", ".name-trigger", function(e){
+                var result = e.target.dataset
+                console.log(result)
+                lightDesk(result)
+            });
+            var desk = ''
+            for(var n=1; n<=65; n++) {
+               desk += '<div id="seat'+n+'" class="seat seat-normal"></div>'
+            }
+            $('#deskMask').append(desk)
+        });
+        </script>
+    </body>
+</html>
