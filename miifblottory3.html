@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>富杉晴 X 普悠瑪易捷 抽獎</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  </head>
+  <body>
+    <div id="app">
+      <div id="comments">
+        <h3>富杉晴海景民宿 X 普悠瑪易捷租車 抽獎名單</h3>
+        <button type="button" class="btn btn-success" onclick="showPass()">取得符合資格並重新編號</button>
+        <button type="button" class="btn btn-warning" onclick="getWinner()">抽獎去！</button>
+        <br/>
+        <div id="catchingWinner" class="spinner-grow text-warning" style="width: 3rem; height: 3rem;display:none;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="progress mr-5 ml-5 mt-5">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="00" aria-valuemin="0"
+                aria-valuemax="100"></div>
+        </div>
+        <div id="progressText" class="mr-5 ml-5 mb-5"></div>
+        <br/>
+        <div id="count" class="mr-5 ml-5"></div>
+        <div class="mr-5 ml-5">
+            ❶留言內容(留言時間)<br/>
+            ❷標註兩位朋友<br/>
+            ❸貼文案讚<br/>
+            ❹粉專案讚(按讚時間)：前面未通過就不檢查<br/>
+            ❺分享貼文(按讚時間)：前面未通過就不檢查<br />
+            ✱未通過會以反灰標示
+        </div>
+        <hr/>
+        <div class="list-group"></div>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <script>
+    let pageID = '1578504078910270'
+    let postID = '2881913551902643' // 2881922228568442 //1578504078910270_2881922228568442/sharedposts
+    // https://www.facebook.com/shares/view?id=2881922228568442
+    let accessToken =
+    'EAACFtrZARuUsBAFBCMI8QyvOI7iciJ6awx97B1CDD1pcsPqoWSlLUwajVIsBsHjp15x2uQQHZAHCHKJaOf9MjWgIxzTsH5eGFP5GSfZACiUUMXVI5Nd3pxA6UN1yNldZChTsH5z6EOJDIiTisI0CNcg8mFENlcDjNVuWLupnbcOGfnxMfAFMNcRgneNSYlcZBL14KRu9xswZDZD'
+
+
+
+    let likes = []
+    let pageLikesLimit = 500
+    let pageLikes = []
+    let pageLikesTemp = 0
+    let totalCount = 0
+    let passCount = 0
+    let failCount = 0
+    moment.locale('zh-tw')
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId            : '147019789351243',
+        autoLogAppEvents : true,
+        xfbml            : true,
+        version          : 'v6.0'
+      });
+      // FB.getLoginStatus(function(response) {
+      //   if (response.status === 'connected') {
+      //     console.log(response.authResponse.accessToken);
+      //   }
+      // });
+      // FB.login(function(response) {
+      //     if (response.authResponse) {
+      //     console.log('Welcome!  Fetching your information.... ', response);
+      //     FB.api('/me', function(response) {
+      //       console.log('Good to see you, ' + response.name + '.');
+      //     });
+      //     } else {
+      //     console.log('User cancelled login or did not fully authorize.');
+      //     }
+      // });
+      $('#progressText').html('❶~❸ 載入留言並審核...')
+      FB.api(
+        '/'+postID+'/comments?fields=message,message_tags,created_time,id,from&filter=stream&limit=1100&access_token='+accessToken,
+        function(response) {
+            console.log(response)
+            let html = ''
+            totalCount = response.data.length
+
+            response.data.forEach((element, index) => {
+                // console.log((index/totalCount)*100)
+                $('#progressText').html('載入留言...'+ index + '/' + totalCount)
+                $('.progress-bar').attr('aria-valuemax', totalCount).attr('aria-valuenow', index).css('width', parseInt(index/totalCount) + '%');
+                html = ''
+              let friends = ''
+              let f_count = 0
+              if (element.hasOwnProperty('message_tags') && element.message_tags.length > 0) {
+              (element.message_tags).forEach(tag => {
+                if (tag.type === 'user') {
+                  friends += tag.name + ''
+                  f_count++
+                }
+
+              })
+              }
+
+              let user_info = (element.from || {}).name
+              let user_id = (element.from || {}).id
+              let has_like = findLike(user_id)
+
+              let has_right_text = element.message.includes('一起入住富杉晴') && (element.message.includes('追風東海岸秘境') || element.message.includes('追風東海岸祕境'))
+              let alert_color = ''
+              let fail = !has_like || f_count < 2 || !has_right_text
+              let toolate = !(moment(element.created_time).isBefore('2020-03-01 19:00'))
+              if (fail || toolate) {
+                alert_color += 'list-group-item-dark'
+              }
+
+              html += '<div id="'+user_id+'" class="list-group-item list-group-item-action '+alert_color+'">'+
+                '<div class="d-flex w-100 justify-content-between">'+
+                  '<h5 class="mb-1">'+(index+1)+ ' ' + '<span class="username">' + user_info + '</span></h5>'+
+                  '<small class="'+(toolate ? 'font-weight-bold':'')+'">'+moment(element.created_time).format('YYYY年MM月DD日 HH:mm')+'</small>'+
+                '</div>'+
+                '<small>❶留言內容:</small>'+
+                '<p class="mb-1'+(!has_right_text ? ' font-weight-bold':'')+'">'+element.message+'</p>'+
+                '<small>❷標註兩位朋友:'+ ((f_count >=2) ? '❤' : ' ') +friends+' ('+ f_count + ')</small><br />'+
+                '<small>❸貼文案讚:'+(has_like? '❤' : '')+'</small><br />'+
+                '<small class="pagelike">❹粉專案讚: 未檢查</small><br />'+
+                '<small class="postshare">❺分享貼文: 未檢查</small>'+
+              '</div>'
+
+            $('#comments .list-group').append(html)
+
+            if (!fail) {
+                pageLikes.push(user_id)
+                // checkShare(user_id)
+            }
+
+            });
+            // $('#comments .list-group').html(html)
+            $('#progressText').html('❹ 審核前面已通過之'+ pageLikes.length +'位粉專案讚...')
+            let flag = Math.ceil(pageLikes.length / pageLikesLimit)
+            for (let j= 0;j<flag;j++) {
+                let from = j*pageLikesLimit
+                let end = from+pageLikesLimit > pageLikes.length ? pageLikes.length : from+pageLikesLimit
+                let data = pageLikes.slice(from, end)
+                checkLike(j, data)
+            }
+
+            checkShare()
+
+    });
+
+      FB.api(
+          '/'+postID+'/likes?limit=1000&access_token='+accessToken,
+          function (response) {
+            if (response) {
+              console.log(response)
+              likes = response.data || []
+              if (response.hasOwnProperty('paging')) {
+                  let next = response.paging.next
+                  callNext('likes', next.split('https://graph.facebook.com/v6.0/')[1])
+              }
+            }
+          }
+      );
+
+      FB.api(
+          '/'+pageID+'/likes?limit=1100&access_token='+accessToken,
+          function (response) {
+            if (response) {
+              console.log(response)
+            }
+          }
+      );
+
+    function callNext(type, url) {
+        FB.api(
+        url,
+        function (response) {
+            if (response) {
+                console.log(response)
+                if (type === 'likes') {
+                    response.data.forEach(lk => {
+                        likes.push(lk)
+                    })
+                }
+                if (response.hasOwnProperty('paging') && response.paging.hasOwnProperty('next')) {
+                    let next = response.paging.next
+                    callNext(type, next.split('https://graph.facebook.com/v6.0/')[1])
+                }
+            }
+        }
+        );
+    }
+
+    // function checkShare(user_id) {
+    //     let result = shares.filter(sh => {
+    //         console.log(sh)
+    //         return user_id === (sh || {}).content_owner_id_new
+    //     })
+    //     if (result.length> 0) {
+    //         $('#'+user_id +' .postshare').html('❺分享貼文: ❤')
+    //     } else {
+    //         $('#'+user_id + '.list-group-item-action').addClass('list-group-item-dark')
+    //     }
+    // }
+
+    function checkShare() {
+        $('#progressText').html('❺ 撈取與審核分享貼文...')
+        $.getJSON('./sharesname4.json', function (json) {
+            var shares = ''
+            shares = json
+            console.log(shares.length)
+            var userlist = $('.username')
+            console.log(userlist.length)
+            shares.forEach((sh, i) => {
+                $('.progress-bar').attr('aria-valuemax', shares.length).attr('aria-valuenow', i).css('width',
+                parseInt(i*100/shares.length) + '%');
+                for(var k=0;k<userlist.length;k++){
+                    var tr = userlist[k]
+                    // console.log(tr.innerText, sh.name, tr.innerText === sh.name)
+                    if (tr.innerText === sh.name) {
+                        console.log(tr.innerText, sh.name, tr.innerText === sh.name)
+                        // console.log(tr.innerText, $(tr).parents().find('.postshare'))
+                        $(tr).parents('.list-group-item ').find('.postshare').html('❺分享貼文: ❤ '+sh.timestamp+'<br /><a target="_blank" href="' +sh.url+'">link</a>')
+                        break
+                    }
+                    if (k === userlist.length-1) {
+                        $(tr).parents('.list-group-item ').addClass('list-group-item-dark')
+                        $(tr).parents('.list-group-item ').find('.postshare').html('❺分享貼文: ')
+                    }
+                }
+                if (i === shares.length - 1) {
+                    console.log('分享分析完成')
+                    $('.progress').hide()
+                    $('#progressText').html('分享分析完成')
+                }
+            })
+        });
+    }
+
+    function showCount() {
+        console.log($('.list-group-item-action').hasClass('list-group-item-dark'))
+        failCount = $('.list-group-item-action.list-group-item-dark').length
+        let ht = '<ul class="list-group list-group-horizontal-sm">'+
+            '<li class="list-group-item list-group-item-danger">貼文留言數：'+ totalCount +'</li>'+
+             '<li class="list-group-item list-group-item-danger" style="display:none;">貼文按讚數：'+ likes.length +'</li>'+
+              '<li class="list-group-item list-group-item-danger" style="display:none;">貼文分享數：'+ '0' +'</li>'+
+            '<li hidden class="list-group-item list-group-item-warning">無符合資格：'+failCount+'</li>'+
+            '<li class="list-group-item" id="passCount" style="display:none;">符合資格：'+''+'</li>'+
+        '</ul><br/>'
+        $('#count').html(ht)
+    }
+
+      function onLikeCheckResponse(response)
+      {
+          // Iterate and check against your id
+          for (var i=0; i<response.data.length; i++)
+          {
+              if (response.data[i].id==pageID)
+              {
+                  return response.data[i].created_time;
+              }
+          }
+          return false;
+      }
+
+    function checkLike(flag, data){
+        if (data.length > pageLikesLimit) {
+            return
+        }
+        let l = data.length
+        console.log(pageLikesTemp)
+        // $('.progress-bar').attr('aria-valuemax', l)
+        for(let i=pageLikesTemp; i< data.length; i++) {
+            let user_id = data[i]
+            let ii = (flag * pageLikesLimit) + parseInt(i) + 1
+            $('#progressText').html('❹ 審核前面已通過之'+ pageLikes.length +'位粉專案讚...'+ ii + '/' + pageLikes.length)
+            $('.progress-bar').attr('aria-valuemax', l).attr('aria-valuenow', ii).css('width',(ii/pageLikes.length)*100
+            + '%');
+            FB.api(user_id+'/likes?pretty=0&access_token='+accessToken,
+            function (response) {
+            if (response) {
+                console.log(response)
+                if (response.hasOwnProperty('error')) {
+                    pageLikesTemp = i
+                    return
+                }
+                let check = onLikeCheckResponse(response)
+                console.log(user_id, check)
+                let res = ''
+                if (check) {
+                    let date = moment(check).format('YYYY年MM月DD日 HH:mm')
+                    res = date
+                    if (moment(date).isBefore('2020-03-01 19:00')){
+                        res += '❤ ' ;
+                    } else {
+                        res +- '(over)'
+                    }
+                }
+                if(res === '') {
+                    $('#'+user_id + '.list-group-item-action').addClass('list-group-item-dark')
+                }
+                $('#'+user_id +' .pagelike').html('❹粉專案讚:'+res)
+
+                if (ii/pageLikes.length>=1) {
+                    showCount()
+                }
+            }
+            });
+        }
+    }
+
+      function findLike(user_id) {
+        return likes.some(element => {
+          return element.id == user_id
+        })
+
+      }
+      };
+      
+    var passlist = []
+    function showPass() {
+        passlist = $('.list-group-item-action:not(.list-group-item-dark)')
+        $('.list-group-item-action.list-group-item-dark').hide()
+        $('#passCount').html('符合資格：' + passlist.length).show()
+        for(var i=0;i<passlist.length;i++) {
+            $(passlist[i]).prepend('<h3 id="winNum'+ (parseInt(i)+1) +'"><button type="button" class="btn btn-lg btn-outline-info">'+(parseInt(i)+1)+'</button></h3>')
+        }
+        console.log(passlist.length)
+    }
+    function getWinner() {
+        var winner = null
+        var rnd = function () {
+        var loader;
+        loader = $('#catchingWinner')
+        loader.show()
+        setTimeout(function () {
+            loader.hide()
+            winner = Math.floor(Math.random() * passlist.length) + 1;
+            console.log(winner)
+            $('#winNum'+winner).parent().addClass('bg-warning')
+            $('html, body').animate({
+            scrollTop: $('#winNum'+winner).offset().top
+            }, 500);
+        }, 4800);
+        };
+        rnd()
+        
+    }
+  </script>
+  <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+</html>
